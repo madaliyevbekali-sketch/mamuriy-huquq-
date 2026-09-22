@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Ma'muriy huquq — Interaktiv test</title>
+<style>
+  /* ============================================================
+     DIZAYN TOKENLARI
+     ============================================================ */
+  :root{
+    --bg: #0a0e1a;
+    --bg-panel: #10162a;
+    --bg-elevated: #161d35;
+    --bg-input: #0d1326;
+    --border: rgba(148,163,196,0.16);
+    --border-strong: rgba(148,163,196,0.30);
+    --text: #e9edf7;
+    --text-dim: #96a2c2;
+    --text-faint: #5f6b8c;
+    --cyan: #29d6ee;
+    --cyan-dim: rgba(41,214,238,0.14);
+    --purple: #a98bfb;
+    --purple-dim: rgba(169,139,251,0.14);
+    --green: #35d399;
+    --green-dim: rgba(53,211,153,0.14);
+    --red: #f7707a;
+    --red-dim: rgba(247,112,122,0.14);
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    --radius: 14px;
+    --radius-sm: 9px;
+    --serif: Georgia, 'Times New Roman', 'Noto Serif', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background: radial-gradient(1200px 800px at 15% -10%, #101a33 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    line-height:1.5;
+  }
+
+  .screen{ display:none; min-height:100vh; padding: 28px 18px 60px; }
+  .screen.active{ display:flex; flex-direction:column; align-items:center; }
+
+  .wrap{ width:100%; max-width: 640px; }
+  .wrap-wide{ width:100%; max-width: 920px; }
+
+  h1,h2,h3{ font-family: var(--serif); font-weight:600; margin:0 0 6px; letter-spacing:0.2px; }
+  p{ margin:0; }
+
+  /* ============================================================
+     HEADER / BRAND
+     ============================================================ */
+  .brand{
+    display:flex; align-items:baseline; gap:10px; margin-bottom: 28px;
+  }
+  .brand .mark{
+    width:38px; height:38px; border-radius:10px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--serif); font-weight:700; color:#0a0e1a; font-size:18px;
+    flex-shrink:0;
+  }
+  .brand-title{ font-family: var(--serif); font-size: 21px; font-weight:600; }
+  .brand-sub{ color: var(--text-faint); font-size: 13px; }
+
+  /* ============================================================
+     CARDS / BUTTONS
+     ============================================================ */
+  .card{
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    box-shadow: var(--shadow);
+  }
+  .card + .card{ margin-top: 16px; }
+
+  label{ display:block; font-size: 13px; color: var(--text-dim); margin-bottom: 7px; }
+  input[type="text"], input[type="password"], input[type="number"], textarea, select{
+    width:100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 11px 13px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: var(--sans);
+    outline:none;
+    transition: border-color .15s ease;
+  }
+  input:focus, textarea:focus, select:focus{ border-color: var(--cyan); }
+  textarea{ resize: vertical; min-height: 64px; }
+
+  .field{ margin-bottom: 16px; }
+  .field-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .field-row > .field{ flex:1; min-width: 140px; }
+
+  button{
+    font-family: var(--sans);
+    cursor:pointer;
+    border:none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    padding: 11px 20px;
+    font-weight:600;
+    transition: transform .08s ease, filter .12s ease, background .15s ease;
+  }
+  button:active{ transform: scale(0.98); }
+  button:focus-visible{ outline: 2px solid var(--cyan); outline-offset:2px; }
+
+  .btn-primary{
+    background: linear-gradient(135deg, var(--cyan), #21b8cf);
+    color:#04121a;
+  }
+  .btn-primary:hover{ filter: brightness(1.08); }
+  .btn-primary:disabled{ opacity:0.45; cursor:not-allowed; filter:none; }
+
+  .btn-secondary{
+    background: var(--bg-elevated);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .btn-secondary:hover{ background: #1b2340; }
+
+  .btn-danger{
+    background: var(--red-dim);
+    color: var(--red);
+    border: 1px solid rgba(247,112,122,0.35);
+  }
+  .btn-danger:hover{ filter: brightness(1.15); }
+
+  .btn-ghost{
+    background: transparent;
+    color: var(--text-faint);
+    border: 1px solid transparent;
+    font-weight:500;
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  .btn-ghost:hover{ color: var(--text-dim); }
+
+  .btn-block{ width:100%; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 18px; }
+
+  .hint{ font-size: 13px; color: var(--text-faint); margin-top: 8px; }
+  .error-text{ font-size: 13.5px; color: var(--red); margin-top: 8px; min-height: 0; }
+
+  /* ============================================================
+     STUDENT START
+     ============================================================ */
+  .footer-link{
+    margin-top: 34px;
+    color: var(--text-faint);
+    font-size: 12.5px;
+    background:none; border:none; cursor:pointer;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color .15s ease, color .15s ease;
+  }
+  .footer-link:hover{ color: var(--text-dim); text-decoration-color: var(--text-faint); }
+
+  /* ============================================================
+     QUIZ VIEW
+     ============================================================ */
+  .quiz-top{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 18px; gap: 12px; flex-wrap: wrap;
+  }
+  .quiz-meta{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+  .meta-chip{
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+    display:flex; align-items:center; gap:6px;
+    white-space:nowrap;
+  }
+  .meta-chip strong{ color: var(--text); font-weight:600; }
+  .timer-chip{ color: var(--cyan); border-color: rgba(41,214,238,0.35); }
+  .timer-chip.low{ color: var(--red); border-color: rgba(247,112,122,0.4); }
+
+  .progress-track{
+    width:100%; height:6px; background: var(--bg-elevated);
+    border-radius: 4px; overflow:hidden; margin-bottom: 22px;
+  }
+  .progress-fill{
+    height:100%; background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius:4px; transition: width .3s ease;
+  }
+
+  .question-text{ font-size: 18px; line-height:1.55; margin-bottom: 22px; font-weight:500; }
+
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option{
+    display:flex; align-items:flex-start; gap:12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 15px;
+    cursor:pointer;
+    transition: border-color .12s ease, background .12s ease;
+  }
+  .option:hover{ border-color: var(--border-strong); }
+  .option .letter{
+    flex-shrink:0;
+    width:26px; height:26px; border-radius:7px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-strong);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 13px; font-weight:700; color: var(--text-dim);
+  }
+  .option.selected{ border-color: var(--cyan); background: var(--cyan-dim); }
+  .option.selected .letter{ background: var(--cyan); border-color: var(--cyan); color:#04121a; }
+  .option-text{ padding-top:3px; font-size: 15px; }
+
+  /* ============================================================
+     STUDENT DONE
+     ============================================================ */
+  .done-icon{
+    width:58px; height:58px; border-radius:50%;
+    background: var(--cyan-dim); border: 1px solid rgba(41,214,238,0.35);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 26px; margin: 0 auto 18px;
+  }
+  .center{ text-align:center; }
+
+  /* ============================================================
+     TEACHER LOGIN MODAL
+     ============================================================ */
+  .modal-backdrop{
+    position:fixed; inset:0; background: rgba(4,6,14,0.72);
+    display:none; align-items:center; justify-content:center; z-index: 50;
+    padding: 18px;
+  }
+  .modal-backdrop.active{ display:flex; }
+  .modal-box{ width:100%; max-width: 380px; }
+
+  /* ============================================================
+     TEACHER PANEL
+     ============================================================ */
+  .teacher-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 20px; flex-wrap:wrap; gap:10px;
+  }
+  .tabs{ display:flex; gap:6px; margin-bottom: 20px; flex-wrap:wrap; }
+  .tab-btn{
+    background: transparent; color: var(--text-faint);
+    border: 1px solid var(--border); font-size:14px; font-weight:600;
+    padding: 9px 16px;
+  }
+  .tab-btn.active{ background: var(--bg-elevated); color: var(--text); border-color: var(--border-strong); }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  .section-heading{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 16px; gap:10px; flex-wrap:wrap;
+  }
+
+  .q-item{
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 15px 16px;
+    margin-bottom: 10px;
+  }
+  .q-item-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+  .q-item-text{ font-size: 14.5px; font-weight:500; }
+  .q-item-meta{ font-size: 12.5px; color: var(--text-faint); margin-top:4px; }
+  .q-item-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .icon-btn{
+    background: var(--bg-input); border: 1px solid var(--border-strong);
+    color: var(--text-dim); padding: 6px 10px; font-size: 13px; font-weight:500;
+  }
+  .icon-btn:hover{ color: var(--text); }
+  .icon-btn.danger:hover{ color: var(--red); border-color: rgba(247,112,122,0.4); }
+
+  .empty-state{
+    text-align:center; padding: 40px 20px; color: var(--text-faint); font-size: 14px;
+  }
+
+  .form-modal-inner{ max-height: 78vh; overflow-y:auto; }
+
+  /* results */
+  .result-row{
+    background: var(--bg-elevated); border:1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom:10px;
+    cursor:pointer;
+  }
+  .result-row:hover{ border-color: var(--border-strong); }
+  .result-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .result-name{ font-weight:600; font-size:15px; }
+  .result-score{
+    font-size: 13px; font-weight:700; padding: 4px 11px; border-radius: 20px;
+  }
+  .score-good{ background: var(--green-dim); color: var(--green); }
+  .score-mid{ background: rgba(250,204,21,0.14); color:#facc15; }
+  .score-bad{ background: var(--red-dim); color: var(--red); }
+  .result-sub{ font-size: 12.5px; color: var(--text-faint); margin-top: 6px; }
+
+  .detail-q{
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; margin-bottom: 10px; background: var(--bg-elevated);
+  }
+  .detail-q-text{ font-size: 14.5px; font-weight:500; margin-bottom: 8px; }
+  .detail-row{ font-size: 13.5px; color: var(--text-dim); margin-top:4px; }
+  .tag-ok{ color: var(--green); font-weight:600; }
+  .tag-bad{ color: var(--red); font-weight:600; }
+  .explanation-box{
+    margin-top:8px; padding: 9px 12px; background: var(--bg-input);
+    border-radius: 8px; font-size: 13px; color: var(--text-dim); border-left: 3px solid var(--purple);
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 480px){
+    .card{ padding: 20px 16px; }
+    .question-text{ font-size:16.5px; }
+    .brand-title{ font-size: 18px; }
+    .quiz-meta{ gap:8px; }
+    .meta-chip{ font-size:12px; padding:5px 10px; }
+  }
+
+  .table-wrap{ overflow-x:auto; }
+  table{ width:100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td{ text-align:left; padding: 9px 10px; border-bottom: 1px solid var(--border); white-space:nowrap; }
+  th{ color: var(--text-faint); font-weight:600; font-size:12px; text-transform:none; }
+
+  .sr-only{ position:absolute; width:1px;height:1px; padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     1) O'QUVCHI: TEST BOSHLASH EKRANI
+     ================================================================ -->
+<div id="view-student-start" class="screen active">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">MH</div>
+      <div>
+        <div class="brand-title">Ma'muriy huquq</div>
+        <div class="brand-sub">Interaktiv test tizimi</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:18px;">Testni boshlashdan oldin</h2>
+      <p class="hint" style="margin-bottom:20px;">Ismingizni kiriting, so'ngra testni boshlang. Test <span id="start-qcount">11</span> savoldan iborat.</p>
+
+      <div class="field">
+        <label for="student-name">Ismingizni kiriting</label>
+        <input type="text" id="student-name" placeholder="Masalan: Bekzod Aliyev" autocomplete="off">
+      </div>
+      <div class="error-text" id="start-error"></div>
+
+      <button class="btn-primary btn-block" onclick="handleStartQuiz()">Testni boshlash</button>
+    </div>
+
+    <button class="footer-link" onclick="openTeacherLogin()">O'qituvchi kirishi</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     2) TEST INTERFEYSI
+     ================================================================ -->
+<div id="view-quiz" class="screen">
+  <div class="wrap">
+    <div class="quiz-top">
+      <div class="brand-title" style="font-size:17px;">Ma'muriy huquq</div>
+      <div class="quiz-meta">
+        <div class="meta-chip"><strong id="q-index">1</strong>&nbsp;/&nbsp;<span id="q-total">11</span></div>
+        <div class="meta-chip">Ball: <strong id="q-score">0</strong></div>
+        <div class="meta-chip timer-chip" id="timer-chip">⏱ <strong id="timer-display">15:00</strong></div>
+      </div>
+    </div>
+
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div class="card">
+      <div class="question-text" id="question-text">Savol matni</div>
+      <div class="options" id="options-container"></div>
+      <div class="error-text" id="answer-error"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="next-btn" onclick="nextQuestion()">Keyingi</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     3) O'QUVCHI: TEST YAKUNLANDI
+     ================================================================ -->
+<div id="view-student-done" class="screen">
+  <div class="wrap center">
+    <div class="card">
+      <div class="done-icon">✓</div>
+      <h2 style="font-size:19px;">Test yakunlandi</h2>
+      <p class="hint" style="margin-top:10px; font-size:14.5px;">Natijangiz o'qituvchiga yuborildi.</p>
+      <button class="btn-secondary" style="margin-top:24px;" onclick="returnToStart()">Bosh sahifaga qaytish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     4) O'QITUVCHI KIRISH (MODAL)
+     ================================================================ -->
+<div id="teacher-login-modal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="card">
+      <h2 style="font-size:17px;">O'qituvchi paneli</h2>
+      <p class="hint" style="margin-bottom:18px;">Kirish uchun parolni kiriting.</p>
+      <div class="field">
+        <label for="teacher-password">Parol</label>
+        <input type="password" id="teacher-password" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')handleTeacherLogin()">
+      </div>
+      <div class="error-text" id="teacher-login-error"></div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="handleTeacherLogin()">Kirish</button>
+        <button class="btn-secondary" onclick="closeTeacherLogin()">Bekor qilish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     5) O'QITUVCHI PANELI
+     ================================================================ -->
+<div id="view-teacher-panel" class="screen">
+  <div class="wrap-wide">
+    <div class="teacher-header">
+      <div class="brand">
+        <div class="mark">MH</div>
+        <div>
+          <div class="brand-title">O'qituvchi paneli</div>
+          <div class="brand-sub">Ma'muriy huquq — boshqaruv</div>
+        </div>
+      </div>
+      <button class="btn-secondary" onclick="teacherLogout()">Chiqish</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="questions" onclick="switchTab('questions')">Savollar</button>
+      <button class="tab-btn" data-tab="results" onclick="switchTab('results')">Natijalar</button>
+      <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">Sozlamalar</button>
+    </div>
+
+    <!-- SAVOLLAR TAB -->
+    <div class="tab-panel active" id="tab-questions">
+      <div class="card">
+        <div class="section-heading">
+          <h3 style="font-size:15.5px;">Savollar ro'yxati (<span id="questions-count">0</span>)</h3>
+          <button class="btn-primary" onclick="openQuestionForm()">+ Savol qo'shish</button>
+        </div>
+        <div id="questions-list"></div>
+      </div>
+    </div>
+
+    <!-- NATIJALAR TAB -->
+    <div class="tab-panel" id="tab-results">
+      <div class="card">
+        <div class="section-heading">
+          <h3 style="font-size:15.5px;">O'quvchilar natijalari (<span id="results-count">0</span>)</h3>
+          <button class="btn-danger" onclick="clearAllResults()">Barchasini tozalash</button>
+        </div>
+        <div id="results-list"></div>
+      </div>
+    </div>
+
+    <!-- SOZLAMALAR TAB -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="card">
+        <h3 style="font-size:15.5px; margin-bottom:16px;">Test vaqti</h3>
+        <div class="field" style="max-width:220px;">
+          <label for="setting-time">Test vaqti (daqiqa)</label>
+          <input type="number" id="setting-time" min="1" max="180">
+        </div>
+        <button class="btn-primary" onclick="saveTimeSetting()">Saqlash</button>
+        <div class="error-text" id="settings-msg"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size:15.5px; margin-bottom:10px;">Parolni o'zgartirish</h3>
+        <p class="hint" style="margin-bottom:14px;">Parol xavfsizlik uchun kod ichidagi <code>TEACHER_PASSWORD</code> o'zgaruvchisida saqlanadi. O'zgartirish uchun HTML faylni tahrirlovchida oching va shu qatorni yangilang. (Eslatma: bu faqat oddiy himoya — haqiqiy internet joylashtirish uchun server tomonidagi autentifikatsiya kerak bo'ladi.)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     6) SAVOL QO'SHISH / TAHRIRLASH MODAL
+     ================================================================ -->
+<div id="question-form-modal" class="modal-backdrop">
+  <div class="modal-box" style="max-width: 520px;">
+    <div class="card form-modal-inner">
+      <h2 style="font-size:17px;" id="question-form-title">Savol qo'shish</h2>
+      <div style="height:16px;"></div>
+
+      <div class="field">
+        <label for="qf-text">Savol matni</label>
+        <textarea id="qf-text" placeholder="Savol matnini kiriting..."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="qf-a">Variant A</label>
+        <input type="text" id="qf-a" placeholder="A variant">
+      </div>
+      <div class="field">
+        <label for="qf-b">Variant B</label>
+        <input type="text" id="qf-b" placeholder="B variant">
+      </div>
+      <div class="field">
+        <label for="qf-c">Variant C</label>
+        <input type="text" id="qf-c" placeholder="C variant">
+      </div>
+      <div class="field">
+        <label for="qf-d">Variant D</label>
+        <input type="text" id="qf-d" placeholder="D variant">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="qf-correct">To'g'ri javob</label>
+          <select id="qf-correct">
+            <option value="a">A</option>
+            <option value="b">B</option>
+            <option value="c">C</option>
+            <option value="d">D</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qf-points">Ball</label>
+          <input type="number" id="qf-points" min="1" value="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="qf-explanation">Tushuntirish</label>
+        <textarea id="qf-explanation" placeholder="To'g'ri javob uchun tushuntirish (ixtiyoriy)"></textarea>
+      </div>
+
+      <div class="error-text" id="question-form-error"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveQuestionForm()">Saqlash</button>
+        <button class="btn-secondary" onclick="closeQuestionForm()">Bekor qilish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     7) O'CHIRISHNI TASDIQLASH MODAL
+     ================================================================ -->
+<div id="confirm-modal" class="modal-backdrop">
+  <div class="modal-box" style="max-width:360px;">
+    <div class="card">
+      <h3 style="font-size:16px;" id="confirm-text">Tasdiqlaysizmi?</h3>
+      <div class="btn-row">
+        <button class="btn-danger" id="confirm-yes-btn" onclick="confirmYes()">Ha, o'chirish</button>
+        <button class="btn-secondary" onclick="closeConfirm()">Bekor qilish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     8) NATIJA TAFSILOTI MODAL
+     ================================================================ -->
+<div id="result-detail-modal" class="modal-backdrop">
+  <div class="modal-box" style="max-width: 620px;">
+    <div class="card form-modal-inner">
+      <div class="section-heading">
+        <h2 style="font-size:17px;" id="detail-title">Natija tafsiloti</h2>
+        <button class="btn-secondary" onclick="closeResultDetail()">Yopish</button>
+      </div>
+      <div id="detail-summary" style="margin-bottom:18px;"></div>
+      <div id="detail-questions"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================================================================
+   MA'MURIY HUQUQ — INTERAKTIV TEST TIZIMI
+   Bitta mustaqil HTML fayl: HTML + CSS + JS, tashqi kutubxonasiz.
+
+   MUHIM XAVFSIZLIK ESLATMASI:
+   Quyidagi parol faqat oddiy foydalanuvchidan o'qituvchi panelini
+   yashirish uchun ishlatiladi. Bu HAQIQIY server xavfsizligi
+   HISOBLANMAYDI — chunki har qanday HTML/JS kodi brauzer orqali
+   ko'rilishi mumkin. Agar bu sayt keyinchalik internetga (masalan,
+   GitHub Pages orqali) joylashtirilsa va haqiqiy maxfiy natijalar/
+   o'quvchilar ma'lumotlari talab qilinsa, albatta server (backend)
+   + ma'lumotlar bazasi + haqiqiy autentifikatsiya tizimi kerak bo'ladi.
+   ================================================================== */
+
+const TEACHER_PASSWORD = "admin123";
+
+const STORAGE_KEYS = {
+  questions: "mh_questions_v1",
+  settings: "mh_settings_v1",
+  results: "mh_results_v1"
+};
+
+/* ------------------------------------------------------------------
+   STANDART (DEFAULT) MA'LUMOTLAR — localStorage bo'sh yoki buzilgan
+   bo'lsa shu holatga qaytiladi.
+   ------------------------------------------------------------------ */
+function getDefaultQuestions(){
+  return [
+    {
+      id: "q1",
+      text: "Ma'muriy huquq qaysi munosabatlarni tartibga soladi?",
+      options: {
+        a: "Fuqarolik-huquqiy shartnoma munosabatlarini",
+        b: "Davlat boshqaruvi va ijro etuvchi hokimiyat sohasidagi munosabatlarni",
+        c: "Faqat jinoiy javobgarlik munosabatlarini",
+        d: "Xalqaro savdo munosabatlarini"
+      },
+      correct: "b",
+      points: 1,
+      explanation: "Ma'muriy huquq davlat boshqaruvi, ijro etuvchi hokimiyat organlarining faoliyati va ular bilan fuqarolar, tashkilotlar o'rtasidagi munosabatlarni tartibga soladi."
+    },
+    {
+      id: "q2",
+      text: "Ma'muriy-huquqiy munosabatlarning majburiy (doimiy) subyekti kim?",
+      options: {
+        a: "Faqat jismoniy shaxs",
+        b: "Faqat notijorat tashkilot",
+        c: "Davlat hokimiyati yoki boshqaruv organi (yoki uning vakolatli mansabdor shaxsi)",
+        d: "Faqat xorijiy fuqaro"
+      },
+      correct: "c",
+      points: 1,
+      explanation: "Ma'muriy-huquqiy munosabatlarda bir tomon doimo davlat hokimiyati yoki boshqaruv vakolatiga ega organ (yoxud mansabdor shaxs) bo'ladi."
+    },
+    {
+      id: "q3",
+      text: "Quyidagilardan qaysi biri ma'muriy huquqbuzarlikning belgisi hisoblanadi?",
+      options: {
+        a: "Faqat og'ir ijtimoiy xavflilik",
+        b: "Qonunga xilof, aybli qilingan harakat (yoki harakatsizlik) uchun javobgarlik nazarda tutilgani",
+        c: "Faqat yuridik shaxs tomonidan sodir etilishi",
+        d: "Faqat xalqaro shartnomani buzish"
+      },
+      correct: "b",
+      points: 1,
+      explanation: "Ma'muriy huquqbuzarlik — qonun hujjatlarida ma'muriy javobgarlik nazarda tutilgan, aybli qilingan noqonuniy (harakat yoki harakatsizlik) xatti-harakatdir."
+    },
+    {
+      id: "q4",
+      text: "Ma'muriy jazo turlariga odatda nimalar kiradi?",
+      options: {
+        a: "Ogohlantirish, jarima, ma'muriy qamoq va boshqa qonunda nazarda tutilgan choralar",
+        b: "Faqat ozodlikdan mahrum qilish",
+        c: "Faqat fuqarolik-huquqiy kompensatsiya",
+        d: "Faqat intizomiy ta'sir choralari"
+      },
+      correct: "a",
+      points: 1,
+      explanation: "Ma'muriy javobgarlik choralariga, jumladan, ogohlantirish, jarima, ma'muriy qamoq, faoliyatni to'xtatib turish kabi choralar kiradi."
+    },
+    {
+      id: "q5",
+      text: "\"Davlat boshqaruvi\" tushunchasi eng to'g'ri qanday ta'riflanadi?",
+      options: {
+        a: "Faqat sud hokimiyatining faoliyati",
+        b: "Ijro etuvchi hokimiyat organlarining qonunlarni amalga oshirish yuzasidan tashkiliy-boshqaruv faoliyati",
+        c: "Faqat xususiy tadbirkorlik faoliyati",
+        d: "Faqat qonun chiqaruvchi hokimiyatning faoliyati"
+      },
+      correct: "b",
+      points: 1,
+      explanation: "Davlat boshqaruvi — bu ijro etuvchi hokimiyat organlarining qonun va boshqa normativ hujjatlarni amalga oshirish, jamiyat hayotini tartibga solish bo'yicha amaliy-tashkiliy faoliyatidir."
+    },
+    {
+      id: "q6",
+      text: "Ijro etuvchi hokimiyat organlariga misol qaysi?",
+      options: {
+        a: "Vazirlar Mahkamasi va vazirliklar",
+        b: "Oliy Majlis",
+        c: "Konstitutsiyaviy sud",
+        d: "Fuqarolar yig'ini"
+      },
+      correct: "a",
+      points: 1,
+      explanation: "Vazirlar Mahkamasi, vazirliklar va davlat qo'mitalari ijro etuvchi hokimiyat tizimiga kiradi."
+    },
+    {
+      id: "q7",
+      text: "Ma'muriy protsess (jarayon) nima uchun zarur?",
+      options: {
+        a: "Faqat soliq to'lash tartibini belgilash uchun",
+        b: "Davlat organlari tomonidan ma'muriy ishlarni ko'rib chiqish va qaror qabul qilish tartibini belgilash uchun",
+        c: "Faqat xalqaro shartnomalarni imzolash uchun",
+        d: "Faqat notarial harakatlarni amalga oshirish uchun"
+      },
+      correct: "b",
+      points: 1,
+      explanation: "Ma'muriy protsess — vakolatli organlarning ma'muriy ishlarni (murojaatlar, nizolar, huquqbuzarliklar) ko'rib chiqish va qaror qabul qilish tartib-qoidalari majmuidir."
+    },
+    {
+      id: "q8",
+      text: "Ma'muriy-huquqiy normaning asosiy vazifasi nima?",
+      options: {
+        a: "Faqat fuqarolarning shaxsiy hayotini tartibga solish",
+        b: "Boshqaruv sohasidagi xatti-harakat qoidalarini belgilab, huquq va majburiyatlarni mustahkamlash",
+        c: "Faqat jinoyatlarni tasniflash",
+        d: "Faqat davlat byudjetini shakllantirish"
+      },
+      correct: "b",
+      points: 1,
+      explanation: "Ma'muriy-huquqiy norma davlat boshqaruvi sohasidagi xulq-atvor qoidalarini o'rnatadi, huquq va majburiyatlarni, javobgarlik shartlarini belgilaydi."
+    },
+    {
+      id: "q9",
+      text: "Ma'muriy nazorat nima maqsadda amalga oshiriladi?",
+      options: {
+        a: "Qonunlarga va qarorlarga rioya etilishini tekshirish va buzilishlarning oldini olish uchun",
+        b: "Faqat soliq yig'ish uchun",
+        c: "Faqat xorijiy investitsiyalarni jalb qilish uchun",
+        d: "Faqat ish haqini hisoblash uchun"
+      },
+      correct: "a",
+      points: 1,
+      explanation: "Ma'muriy nazorat vakolatli organlar tomonidan qonunchilikka rioya etilishini kuzatish, buzilishlarni aniqlash va bartaraf etish maqsadida amalga oshiriladi."
+    },
+    {
+      id: "q10",
+      text: "Ma'muriy javobgarlikka tortish uchun umumiy shart nimalardan iborat?",
+      options: {
+        a: "Shaxsning aybi va qilmishning qonunda taqiqlangan tarkibga mos kelishi",
+        b: "Faqat shaxsning yoshi 30 dan oshgan bo'lishi",
+        c: "Faqat shaxsning fuqaroligi bo'lmasligi",
+        d: "Faqat qilmishning bir necha marta takrorlanishi"
+      },
+      correct: "a",
+      points: 1,
+      explanation: "Ma'muriy javobgarlik uchun shaxsning aybi isbotlanishi va qilingan xatti-harakat qonunda belgilangan huquqbuzarlik tarkibiga mos kelishi zarur."
+    },
+    {
+      id: "q11",
+      text: "Ma'muriy huquq manbalariga odatda nimalar kiradi?",
+      options: {
+        a: "Faqat sud amaliyoti",
+        b: "Konstitutsiya, qonunlar, hukumat qarorlari va boshqa normativ-huquqiy hujjatlar",
+        c: "Faqat xalqaro urf-odatlar",
+        d: "Faqat ilmiy nazariyalar"
+      },
+      correct: "b",
+      points: 1,
+      explanation: "Ma'muriy huquq manbalariga Konstitutsiya, qonunlar, Prezident farmonlari, hukumat qarorlari va boshqa normativ-huquqiy hujjatlar kiradi."
+    }
+  ];
+}
+
+function getDefaultSettings(){
+  return { timeMinutes: 15 };
+}
+
+/* ------------------------------------------------------------------
+   LOCALSTORAGE QATLAMI — xatolardan himoyalangan
+   ------------------------------------------------------------------ */
+function safeGet(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    if(parsed === null || parsed === undefined) return fallback;
+    return parsed;
+  }catch(e){
+    console.warn("localStorage o'qishda xato, standart qiymatga qaytildi:", key, e);
+    return fallback;
+  }
+}
+
+function safeSet(key, value){
+  try{
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  }catch(e){
+    console.warn("localStorage yozishda xato:", key, e);
+    return false;
+  }
+}
+
+function loadQuestions(){
+  const data = safeGet(STORAGE_KEYS.questions, null);
+  if(!Array.isArray(data) || data.length === 0) return getDefaultQuestions();
+  // Har bir elementning to'g'ri tuzilishga ega ekanini tekshiramiz
+  const valid = data.every(q => q && q.id && q.text && q.options &&
+    q.options.a !== undefined && q.options.b !== undefined &&
+    q.options.c !== undefined && q.options.d !== undefined &&
+    ["a","b","c","d"].includes(q.correct));
+  return valid ? data : getDefaultQuestions();
+}
+
+function loadSettings(){
+  const data = safeGet(STORAGE_KEYS.settings, null);
+  if(!data || typeof data.timeMinutes !== "number" || data.timeMinutes <= 0) return getDefaultSettings();
+  return data;
+}
+
+function loadResults(){
+  const data = safeGet(STORAGE_KEYS.results, null);
+  return Array.isArray(data) ? data : [];
+}
+
+let STATE = {
+  questions: loadQuestions(),
+  settings: loadSettings(),
+  results: loadResults(),
+
+  // joriy test holati
+  currentName: "",
+  currentIndex: 0,
+  currentAnswers: [],   // {qid, selected}
+  timerSeconds: 0,
+  timerHandle: null,
+
+  editingQuestionId: null,
+  confirmCallback: null
+};
+
+function persistQuestions(){ safeSet(STORAGE_KEYS.questions, STATE.questions); }
+function persistSettings(){ safeSet(STORAGE_KEYS.settings, STATE.settings); }
+function persistResults(){ safeSet(STORAGE_KEYS.results, STATE.results); }
+
+/* ==================================================================
+   EKRANLARNI ALMASHTIRISH
+   ================================================================== */
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* ==================================================================
+   O'QUVCHI: TESTNI BOSHLASH
+   ================================================================== */
+function handleStartQuiz(){
+  const nameInput = document.getElementById("student-name");
+  const name = nameInput.value.trim();
+  const errEl = document.getElementById("start-error");
+
+  if(!name){
+    errEl.textContent = "Iltimos, ismingizni kiriting.";
+    return;
+  }
+  if(STATE.questions.length === 0){
+    errEl.textContent = "Hozircha savollar mavjud emas. O'qituvchi bilan bog'laning.";
+    return;
+  }
+  errEl.textContent = "";
+
+  STATE.currentName = name;
+  STATE.currentIndex = 0;
+  STATE.currentAnswers = STATE.questions.map(q => ({ qid: q.id, selected: null }));
+  STATE.timerSeconds = Math.max(1, Math.round(STATE.settings.timeMinutes)) * 60;
+
+  document.getElementById("q-total").textContent = STATE.questions.length;
+
+  showScreen("view-quiz");
+  renderQuestion();
+  startTimer();
+}
+
+/* ==================================================================
+   TAYMER
+   ================================================================== */
+function startTimer(){
+  stopTimer();
+  updateTimerDisplay();
+  STATE.timerHandle = setInterval(() => {
+    STATE.timerSeconds--;
+    if(STATE.timerSeconds <= 0){
+      STATE.timerSeconds = 0;
+      updateTimerDisplay();
+      stopTimer();
+      finishQuiz(true);
+      return;
+    }
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function stopTimer(){
+  if(STATE.timerHandle){
+    clearInterval(STATE.timerHandle);
+    STATE.timerHandle = null;
+  }
+}
+
+function updateTimerDisplay(){
+  const m = Math.floor(STATE.timerSeconds / 60);
+  const s = STATE.timerSeconds % 60;
+  const text = String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+  document.getElementById("timer-display").textContent = text;
+  const chip = document.getElementById("timer-chip");
+  if(STATE.timerSeconds <= 60){ chip.classList.add("low"); } else { chip.classList.remove("low"); }
+}
+
+/* ==================================================================
+   SAVOLNI KO'RSATISH
+   ================================================================== */
+function renderQuestion(){
+  const q = STATE.questions[STATE.currentIndex];
+  document.getElementById("q-index").textContent = STATE.currentIndex + 1;
+  document.getElementById("question-text").textContent = q.text;
+  document.getElementById("answer-error").textContent = "";
+
+  const pct = Math.round((STATE.currentIndex) / STATE.questions.length * 100);
+  document.getElementById("progress-fill").style.width = pct + "%";
+
+  document.getElementById("q-score").textContent = calcRunningScore();
+
+  const container = document.getElementById("options-container");
+  container.innerHTML = "";
+  const letters = ["a","b","c","d"];
+  const currentAnswer = STATE.currentAnswers[STATE.currentIndex].selected;
+
+  letters.forEach(letter => {
+    const optDiv = document.createElement("div");
+    optDiv.className = "option" + (currentAnswer === letter ? " selected" : "");
+    optDiv.setAttribute("role","button");
+    optDiv.setAttribute("tabindex","0");
+    optDiv.onclick = () => selectOption(letter);
+    optDiv.onkeydown = (e) => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); selectOption(letter); } };
+
+    const letterEl = document.createElement("div");
+    letterEl.className = "letter";
+    letterEl.textContent = letter.toUpperCase();
+
+    const textEl = document.createElement("div");
+    textEl.className = "option-text";
+    textEl.textContent = q.options[letter];
+
+    optDiv.appendChild(letterEl);
+    optDiv.appendChild(textEl);
+    container.appendChild(optDiv);
+  });
+
+  const nextBtn = document.getElementById("next-btn");
+  nextBtn.textContent = (STATE.currentIndex === STATE.questions.length - 1) ? "Testni yakunlash" : "Keyingi";
+}
+
+function selectOption(letter){
+  STATE.currentAnswers[STATE.currentIndex].selected = letter;
+  document.getElementById("answer-error").textContent = "";
+  renderQuestion();
+}
+
+function calcRunningScore(){
+  let score = 0;
+  STATE.currentAnswers.forEach((ans, idx) => {
+    if(ans.selected && ans.selected === STATE.questions[idx].correct){
+      score += STATE.questions[idx].points || 1;
+    }
+  });
+  return score;
+}
+
+function nextQuestion(){
+  const current = STATE.currentAnswers[STATE.currentIndex];
+  if(!current.selected){
+    document.getElementById("answer-error").textContent = "Avval javob variantini tanlang.";
+    return;
+  }
+  if(STATE.currentIndex < STATE.questions.length - 1){
+    STATE.currentIndex++;
+    renderQuestion();
+  }else{
+    finishQuiz(false);
+  }
+}
+
+/* ==================================================================
+   TESTNI YAKUNLASH VA NATIJANI HISOBLASH
+   ================================================================== */
+function finishQuiz(autoSubmitted){
+  stopTimer();
+
+  let correctCount = 0, incorrectCount = 0, unansweredCount = 0;
+  let score = 0, maxScore = 0;
+  const answerDetails = [];
+
+  STATE.questions.forEach((q, idx) => {
+    const selected = STATE.currentAnswers[idx].selected;
+    const points = q.points || 1;
+    maxScore += points;
+    const isCorrect = selected === q.correct;
+    if(selected === null){ unansweredCount++; }
+    else if(isCorrect){ correctCount++; score += points; }
+    else{ incorrectCount++; }
+
+    answerDetails.push({
+      qid: q.id,
+      questionText: q.text,
+      options: q.options,
+      selected: selected,
+      correct: q.correct,
+      isCorrect: isCorrect,
+      points: points,
+      explanation: q.explanation || ""
+    });
+  });
+
+  const percent = maxScore > 0 ? Math.round((score / maxScore) * 1000) / 10 : 0;
+
+  const result = {
+    id: "r_" + Date.now() + "_" + Math.random().toString(36).slice(2,7),
+    name: STATE.currentName,
+    date: new Date().toLocaleString("uz-UZ"),
+    autoSubmitted: !!autoSubmitted,
+    correctCount, incorrectCount, unansweredCount,
+    totalQuestions: STATE.questions.length,
+    score, maxScore, percent,
+    answers: answerDetails
+  };
+
+  STATE.results.unshift(result);
+  persistResults();
+
+  showScreen("view-student-done");
+}
+
+function returnToStart(){
+  document.getElementById("student-name").value = "";
+  showScreen("view-student-start");
+}
+
+/* ==================================================================
+   O'QITUVCHI: KIRISH / CHIQISH
+   ================================================================== */
+function openTeacherLogin(){
+  document.getElementById("teacher-password").value = "";
+  document.getElementById("teacher-login-error").textContent = "";
+  document.getElementById("teacher-login-modal").classList.add("active");
+  setTimeout(() => document.getElementById("teacher-password").focus(), 50);
+}
+
+function closeTeacherLogin(){
+  document.getElementById("teacher-login-modal").classList.remove("active");
+}
+
+function handleTeacherLogin(){
+  const pass = document.getElementById("teacher-password").value;
+  if(pass === TEACHER_PASSWORD){
+    closeTeacherLogin();
+    enterTeacherPanel();
+  }else{
+    document.getElementById("teacher-login-error").textContent = "Parol noto'g'ri. Qaytadan urinib ko'ring.";
+  }
+}
+
+function enterTeacherPanel(){
+  showScreen("view-teacher-panel");
+  switchTab("questions");
+  renderQuestionsList();
+  renderResultsList();
+  document.getElementById("setting-time").value = STATE.settings.timeMinutes;
+}
+
+function teacherLogout(){
+  showScreen("view-student-start");
+}
+
+function switchTab(tab){
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+}
+
+/* ==================================================================
+   O'QITUVCHI: SAVOLLAR RO'YXATI
+   ================================================================== */
+function renderQuestionsList(){
+  const list = document.getElementById("questions-list");
+  document.getElementById("questions-count").textContent = STATE.questions.length;
+  document.getElementById("start-qcount").textContent = STATE.questions.length;
+
+  if(STATE.questions.length === 0){
+    list.innerHTML = '<div class="empty-state">Hozircha savollar yo\'q. "+ Savol qo\'shish" tugmasini bosing.</div>';
+    return;
+  }
+
+  list.innerHTML = "";
+  STATE.questions.forEach((q, idx) => {
+    const item = document.createElement("div");
+    item.className = "q-item";
+
+    const top = document.createElement("div");
+    top.className = "q-item-top";
+
+    const left = document.createElement("div");
+    left.style.flex = "1";
+    const textEl = document.createElement("div");
+    textEl.className = "q-item-text";
+    textEl.textContent = (idx+1) + ". " + q.text;
+    const metaEl = document.createElement("div");
+    metaEl.className = "q-item-meta";
+    metaEl.textContent = "To'g'ri javob: " + q.correct.toUpperCase() + " · Ball: " + (q.points || 1);
+    left.appendChild(textEl);
+    left.appendChild(metaEl);
+
+    const actions = document.createElement("div");
+    actions.className = "q-item-actions";
+    const editBtn = document.createElement("button");
+    editBtn.className = "icon-btn";
+    editBtn.textContent = "✏️ Tahrirlash";
+    editBtn.onclick = () => openQuestionForm(q.id);
+    const delBtn = document.createElement("button");
+    delBtn.className = "icon-btn danger";
+    delBtn.textContent = "🗑️ O'chirish";
+    delBtn.onclick = () => askDeleteQuestion(q.id);
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+
+    top.appendChild(left);
+    top.appendChild(actions);
+    item.appendChild(top);
+    list.appendChild(item);
+  });
+}
+
+function openQuestionForm(questionId){
+  STATE.editingQuestionId = questionId || null;
+  document.getElementById("question-form-error").textContent = "";
+
+  if(questionId){
+    const q = STATE.questions.find(x => x.id === questionId);
+    document.getElementById("question-form-title").textContent = "Savolni tahrirlash";
+    document.getElementById("qf-text").value = q.text;
+    document.getElementById("qf-a").value = q.options.a;
+    document.getElementById("qf-b").value = q.options.b;
+    document.getElementById("qf-c").value = q.options.c;
+    document.getElementById("qf-d").value = q.options.d;
+    document.getElementById("qf-correct").value = q.correct;
+    document.getElementById("qf-points").value = q.points || 1;
+    document.getElementById("qf-explanation").value = q.explanation || "";
+  }else{
+    document.getElementById("question-form-title").textContent = "Savol qo'shish";
+    document.getElementById("qf-text").value = "";
+    document.getElementById("qf-a").value = "";
+    document.getElementById("qf-b").value = "";
+    document.getElementById("qf-c").value = "";
+    document.getElementById("qf-d").value = "";
+    document.getElementById("qf-correct").value = "a";
+    document.getElementById("qf-points").value = 1;
+    document.getElementById("qf-explanation").value = "";
+  }
+
+  document.getElementById("question-form-modal").classList.add("active");
+}
+
+function closeQuestionForm(){
+  document.getElementById("question-form-modal").classList.remove("active");
+  STATE.editingQuestionId = null;
+}
+
+function saveQuestionForm(){
+  const text = document.getElementById("qf-text").value.trim();
+  const a = document.getElementById("qf-a").value.trim();
+  const b = document.getElementById("qf-b").value.trim();
+  const c = document.getElementById("qf-c").value.trim();
+  const d = document.getElementById("qf-d").value.trim();
+  const correct = document.getElementById("qf-correct").value;
+  const points = parseInt(document.getElementById("qf-points").value, 10);
+  const explanation = document.getElementById("qf-explanation").value.trim();
+
+  const errEl = document.getElementById("question-form-error");
+
+  if(!text || !a || !b || !c || !d){
+    errEl.textContent = "Iltimos, savol matni va barcha 4 ta variantni to'ldiring.";
+    return;
+  }
+  if(!points || points < 1){
+    errEl.textContent = "Ball kamida 1 bo'lishi kerak.";
+    return;
+  }
+
+  const questionData = {
+    id: STATE.editingQuestionId || ("q_" + Date.now() + "_" + Math.random().toString(36).slice(2,7)),
+    text, options: { a, b, c, d }, correct, points, explanation
+  };
+
+  if(STATE.editingQuestionId){
+    const idx = STATE.questions.findIndex(x => x.id === STATE.editingQuestionId);
+    STATE.questions[idx] = questionData;
+  }else{
+    STATE.questions.push(questionData);
+  }
+
+  persistQuestions();
+  closeQuestionForm();
+  renderQuestionsList();
+}
+
+function askDeleteQuestion(questionId){
+  openConfirm("Bu savolni o'chirishni tasdiqlaysizmi?", () => {
+    STATE.questions = STATE.questions.filter(q => q.id !== questionId);
+    persistQuestions();
+    renderQuestionsList();
+  });
+}
+
+/* ==================================================================
+   O'QITUVCHI: NATIJALAR
+   ================================================================== */
+function renderResultsList(){
+  const list = document.getElementById("results-list");
+  document.getElementById("results-count").textContent = STATE.results.length;
+
+  if(STATE.results.length === 0){
+    list.innerHTML = '<div class="empty-state">Hozircha hech kim test topshirmagan.</div>';
+    return;
+  }
+
+  list.innerHTML = "";
+  STATE.results.forEach(r => {
+    const row = document.createElement("div");
+    row.className = "result-row";
+    row.onclick = () => openResultDetail(r.id);
+
+    const top = document.createElement("div");
+    top.className = "result-top";
+
+    const nameEl = document.createElement("div");
+    nameEl.className = "result-name";
+    nameEl.textContent = r.name;
+
+    const scoreClass = r.percent >= 70 ? "score-good" : (r.percent >= 40 ? "score-mid" : "score-bad");
+    const scoreEl = document.createElement("div");
+    scoreEl.className = "result-score " + scoreClass;
+    scoreEl.textContent = r.score + " / " + r.maxScore + " (" + r.percent + "%)";
+
+    top.appendChild(nameEl);
+    top.appendChild(scoreEl);
+
+    const sub = document.createElement("div");
+    sub.className = "result-sub";
+    sub.textContent = r.date + " · To'g'ri: " + r.correctCount + " · Noto'g'ri: " + r.incorrectCount +
+      (r.autoSubmitted ? " · Vaqt tugagach avtomatik yakunlangan" : "");
+
+    const actions = document.createElement("div");
+    actions.style.marginTop = "10px";
+    const delBtn = document.createElement("button");
+    delBtn.className = "icon-btn danger";
+    delBtn.textContent = "🗑️ O'chirish";
+    delBtn.onclick = (e) => { e.stopPropagation(); askDeleteResult(r.id); };
+    actions.appendChild(delBtn);
+
+    row.appendChild(top);
+    row.appendChild(sub);
+    row.appendChild(actions);
+    list.appendChild(row);
+  });
+}
+
+function askDeleteResult(resultId){
+  openConfirm("Bu natijani o'chirishni tasdiqlaysizmi?", () => {
+    STATE.results = STATE.results.filter(r => r.id !== resultId);
+    persistResults();
+    renderResultsList();
+  });
+}
+
+function clearAllResults(){
+  if(STATE.results.length === 0) return;
+  openConfirm("Barcha natijalarni o'chirishni tasdiqlaysizmi? Bu amalni ortga qaytarib bo'lmaydi.", () => {
+    STATE.results = [];
+    persistResults();
+    renderResultsList();
+  });
+}
+
+function openResultDetail(resultId){
+  const r = STATE.results.find(x => x.id === resultId);
+  if(!r) return;
+
+  document.getElementById("detail-title").textContent = r.name + " — natija tafsiloti";
+
+  const summary = document.getElementById("detail-summary");
+  const scoreClass = r.percent >= 70 ? "score-good" : (r.percent >= 40 ? "score-mid" : "score-bad");
+  summary.innerHTML = "";
+  const chipsWrap = document.createElement("div");
+  chipsWrap.style.display = "flex";
+  chipsWrap.style.gap = "10px";
+  chipsWrap.style.flexWrap = "wrap";
+
+  const chips = [
+    ["Sana", r.date],
+    ["Ball", r.score + " / " + r.maxScore],
+    ["Foiz", r.percent + "%"],
+    ["To'g'ri", String(r.correctCount)],
+    ["Noto'g'ri", String(r.incorrectCount)]
+  ];
+  chips.forEach(([label, val]) => {
+    const chip = document.createElement("div");
+    chip.className = "meta-chip";
+    chip.innerHTML = label + ": <strong>" + val + "</strong>";
+    chipsWrap.appendChild(chip);
+  });
+  summary.appendChild(chipsWrap);
+
+  const qWrap = document.getElementById("detail-questions");
+  qWrap.innerHTML = "";
+  r.answers.forEach((a, idx) => {
+    const box = document.createElement("div");
+    box.className = "detail-q";
+
+    const qText = document.createElement("div");
+    qText.className = "detail-q-text";
+    qText.textContent = (idx+1) + ". " + a.questionText;
+    box.appendChild(qText);
+
+    const studentAnsRow = document.createElement("div");
+    studentAnsRow.className = "detail-row";
+    const selectedText = a.selected ? (a.selected.toUpperCase() + ") " + a.options[a.selected]) : "Javob berilmagan";
+    studentAnsRow.innerHTML = "O'quvchi javobi: " + selectedText;
+    box.appendChild(studentAnsRow);
+
+    const correctRow = document.createElement("div");
+    correctRow.className = "detail-row";
+    correctRow.innerHTML = "To'g'ri javob: " + a.correct.toUpperCase() + ") " + a.options[a.correct];
+    box.appendChild(correctRow);
+
+    const resultRow = document.createElement("div");
+    resultRow.className = "detail-row";
+    resultRow.innerHTML = a.isCorrect ? '<span class="tag-ok">✅ To\'g\'ri</span>' : '<span class="tag-bad">❌ Noto\'g\'ri</span>';
+    box.appendChild(resultRow);
+
+    if(a.explanation){
+      const expBox = document.createElement("div");
+      expBox.className = "explanation-box";
+      expBox.textContent = a.explanation;
+      box.appendChild(expBox);
+    }
+
+    qWrap.appendChild(box);
+  });
+
+  document.getElementById("result-detail-modal").classList.add("active");
+}
+
+function closeResultDetail(){
+  document.getElementById("result-detail-modal").classList.remove("active");
+}
+
+/* ==================================================================
+   O'QITUVCHI: SOZLAMALAR
+   ================================================================== */
+function saveTimeSetting(){
+  const val = parseInt(document.getElementById("setting-time").value, 10);
+  const msgEl = document.getElementById("settings-msg");
+  if(!val || val < 1){
+    msgEl.style.color = "var(--red)";
+    msgEl.textContent = "Iltimos, to'g'ri vaqt kiriting (kamida 1 daqiqa).";
+    return;
+  }
+  STATE.settings.timeMinutes = val;
+  persistSettings();
+  msgEl.style.color = "var(--green)";
+  msgEl.textContent = "Saqlandi.";
+  setTimeout(() => { msgEl.textContent = ""; }, 2500);
+}
+
+/* ==================================================================
+   TASDIQLASH MODALI (universal)
+   ================================================================== */
+function openConfirm(text, onYes){
+  document.getElementById("confirm-text").textContent = text;
+  STATE.confirmCallback = onYes;
+  document.getElementById("confirm-modal").classList.add("active");
+}
+
+function closeConfirm(){
+  document.getElementById("confirm-modal").classList.remove("active");
+  STATE.confirmCallback = null;
+}
+
+function confirmYes(){
+  const cb = STATE.confirmCallback;
+  closeConfirm();
+  if(cb) cb();
+}
+
+/* ==================================================================
+   BOSHLANG'ICH ISHGA TUSHIRISH
+   ================================================================== */
+document.getElementById("start-qcount").textContent = STATE.questions.length;
+</script>
+</body>
+</html>
